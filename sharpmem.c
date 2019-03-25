@@ -5,7 +5,7 @@
 */
 
 #include "sharpmem.h"
-
+#include <string.h> // memset
 #ifndef _swap_int16_t
 #define _swap_int16_t(a, b) { int16_t t = a; a = b; b = t; }
 #endif
