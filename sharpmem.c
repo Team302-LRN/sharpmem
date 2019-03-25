@@ -113,9 +113,9 @@ void ADSM_drawPixel(Adafruit_SharpMem *adsm, int16_t x, int16_t y, uint16_t colo
   }
 
   if(color) {
-    sharpmem_buffer[(y * WIDTH + x) / 8] |= set[x & 7];
+    adsm->sharpmem_buffer[(y * WIDTH + x) / 8] |= set[x & 7];
   } else {
-    sharpmem_buffer[(y * WIDTH + x) / 8] &= clr[x & 7];
+    adsom->sharpmem_buffer[(y * WIDTH + x) / 8] &= clr[x & 7];
   }
 }
 
@@ -139,16 +139,15 @@ uint8_t ADSM_getPixel(Adafruit_SharpMem *adsm, uint16_t x, uint16_t y)
     break;
   }
 
-  return sharpmem_buffer[(y * WIDTH + x) / 8] &
-    set[x & 7] ? 1 : 0;
+  return adsm->sharpmem_buffer[(y * WIDTH + x) / 8] & set[x & 7] ? 1 : 0;
 }
 
 void ADSM_clearDisplay(Adafruit_SharpMem *adsm)
 {
-  memset(sharpmem_buffer, 0xff, (WIDTH * HEIGHT) / 8);
+  memset(adsm->sharpmem_buffer, 0xff, (WIDTH * HEIGHT) / 8);
   // Send the clear screen command rather than doing a HW refresh (quicker)
   // SS = HIGH
-  sendbyte(_sharpmem_vcom | SHARPMEM_BIT_CLEAR);
+  sendbyte(adsm->sharpmem_vcom | SHARPMEM_BIT_CLEAR);
   sendbyteLSB(0x00);
   TOGGLE_VCOM;
   // SS = LOW
@@ -161,7 +160,7 @@ void ADSM_refresh(Adafruit_SharpMem *adsm)
 
   // Send the write command
   // SS = HIGH
-  sendbyte(SHARPMEM_BIT_WRITECMD | _sharpmem_vcom);
+  sendbyte(SHARPMEM_BIT_WRITECMD | adsm->sharpmem_vcom);
   TOGGLE_VCOM;
 
   // Send the address for line 1
@@ -171,7 +170,7 @@ void ADSM_refresh(Adafruit_SharpMem *adsm)
   // Send image buffer
   for (i=0; i<totalbytes; i++)
   {
-    sendbyteLSB(sharpmem_buffer[i]);
+    sendbyteLSB(adsm->sharpmem_buffer[i]);
     currentline = ((i+1)/(WIDTH/8)) + 1;
     if(currentline != oldline)
     {
