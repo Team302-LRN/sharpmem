@@ -6,6 +6,9 @@
 
 #include "sharpmem.h"
 #include <string.h> // memset
+#include <xc.h>
+#include <stdint.h>
+
 #ifndef _swap_int16_t
 #define _swap_int16_t(a, b) { int16_t t = a; a = b; b = t; }
 #endif
@@ -27,25 +30,40 @@
       9   EXTMODE         COM Inversion Select (Low = SW clock/serial)
       7   EXTCOMIN        External COM Inversion Signal
       8   DISP            Display On(High)/Off(Low)
-
  **************************************************************************/
+
+
+ /*
+  | Display Pin  | Schematic Name    |   PIC Pin  |
+  | ------------ | ----------------- | ---------- |
+  | CS           | SS1               | RB5        |
+  | D1           | SDI               | RB3        |
+  | SCK          | SCK               | RB2        |
+*/
+
+
+
 
 #define SHARPMEM_BIT_WRITECMD   (0x80)
 #define SHARPMEM_BIT_VCOM       (0x40)
 #define SHARPMEM_BIT_CLEAR      (0x20)
 #define TOGGLE_VCOM             do { _sharpmem_vcom = _sharpmem_vcom ? 0x00 : SHARPMEM_BIT_VCOM; } while(0);
 
+#define _HIGH_ (1)
+#define _LOW_ (0)
+
+
+
 
 bool ADSM_begin(Adafruit_SharpMem *adsm)
 {
-  // SS = HIGH
-  // CLK = LOW
-  // MOSI = HIGH
+  set_ss(_HIGH_);
+  set_clk(_LOW_);
+  set_mosi(_HIGH_);
 
-  // ss = OUTPUT
-  // clk = OUTPUT
-  // MOSI = OUTPUT
-
+  ss_config_out();
+  mosi_config_out();
+  clk_config_out();
 
   adsm->sharpmem_vcom = SHARPMEM_BIT_VCOM;
   return true;
@@ -55,36 +73,35 @@ void ADSM_sendbyte(Adafruit_SharpMem *adsm, uint8_t data)
 {
   uint8_t i;
   for (i = 0; i < 8; ++i) {
-    // CLK = LOW
+    set_clk(_LOW_);
     if (data & 0x80) {
-      // MOSI = HIGH
+      set_mosi(_HIGH_);
     } else {
-      // MOSI = LOW
+      set_mosi(_LOW_);
     }
 
-    // CLK = HIGH
+    set_clk(_HIGH_);
     data <<= 1;
   }
   // Make sure clock ends low
-  // CLK = LOW
+  set_clk(_LOW_);
 }
 
 void ADSM_sendbyteLSB(Adafruit_SharpMem *adsm, uint8_t data)
 {
   uint8_t i;
   for (i = 0; i < 8; ++i) {
-    // CLK = LOW
+    set_clk(_LOW_);
     if (data & 0x01) {
-      // MOSI = HIGH
+      set_mosi(_HIGH_);
     } else {
       MOSI = LOW;
     }
-    // clock is active high
-    // CLK = HIGH
+    set_clk(_HIGH_);
     data >>= 1;
   }
   // Make sure clock ends low
-  // CLK = LOW
+  set_clk(_LOW_);
 }
 
 // 1<<n is a costly operation on AVR -- table usu. smaller & faster
@@ -146,11 +163,11 @@ void ADSM_clearDisplay(Adafruit_SharpMem *adsm)
 {
   memset(adsm->sharpmem_buffer, 0xff, (WIDTH * HEIGHT) / 8);
   // Send the clear screen command rather than doing a HW refresh (quicker)
-  // SS = HIGH
-  sendbyte(adsm->sharpmem_vcom | SHARPMEM_BIT_CLEAR);
-  sendbyteLSB(0x00);
+  set_ss(_HIGH_);
+  ADSM_sendbyte(adsm, adsm->sharpmem_vcom | SHARPMEM_BIT_CLEAR);
+  ADSM_sendbyteLSB(adsm, 0x00);
   TOGGLE_VCOM;
-  // SS = LOW
+  set_ss(_LOW_);
 }
 
 void ADSM_refresh(Adafruit_SharpMem *adsm)
@@ -159,26 +176,26 @@ void ADSM_refresh(Adafruit_SharpMem *adsm)
   totalbytes = (WIDTH * HEIGHT) / 8;
 
   // Send the write command
-  // SS = HIGH
-  sendbyte(SHARPMEM_BIT_WRITECMD | adsm->sharpmem_vcom);
+  set_ss(_HIGH_);
+  ADSM_sendbyte(adsm, SHARPMEM_BIT_WRITECMD | adsm->sharpmem_vcom);
   TOGGLE_VCOM;
 
   // Send the address for line 1
   oldline = currentline = 1;
-  sendbyteLSB(currentline);
+  ADSM_sendbyteLSB(adsm, currentline);
 
   // Send image buffer
   for (i=0; i<totalbytes; i++)
   {
-    sendbyteLSB(adsm->sharpmem_buffer[i]);
+    ADSM_sendbyteLSB(adsm, adsm->sharpmem_buffer[i]);
     currentline = ((i+1)/(WIDTH/8)) + 1;
     if(currentline != oldline)
     {
       // Send end of line and address bytes
-      sendbyteLSB(0x00);
+      ADSM_sendbyteLSB(adsm, 0x00);
       if (currentline <= HEIGHT)
       {
-        sendbyteLSB(currentline);
+        ADSM_sendbyteLSB(adsm, currentline);
       }
       oldline = currentline;
     }
@@ -186,5 +203,5 @@ void ADSM_refresh(Adafruit_SharpMem *adsm)
 
   // Send another trailing 8 bits for the last line
   sendbyteLSB(0x00);
-  // SS = LOW
+  set_ss(_LOW_);
 }
