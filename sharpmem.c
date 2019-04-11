@@ -47,15 +47,17 @@
 #define SHARPMEM_BIT_WRITECMD   (0x80)
 #define SHARPMEM_BIT_VCOM       (0x40)
 #define SHARPMEM_BIT_CLEAR      (0x20)
-#define TOGGLE_VCOM             do { _sharpmem_vcom = _sharpmem_vcom ? 0x00 : SHARPMEM_BIT_VCOM; } while(0);
 
 #define _HIGH_ (1)
 #define _LOW_ (0)
 
+void TOGGLE_VCOM(struct Adafruit_SharpMem *adsm) 
+{
+    do { adsm->sharpmem_vcom = adsm->sharpmem_vcom ? 0x00 : SHARPMEM_BIT_VCOM; } while(0);
+}
 
 
-
-bool ADSM_begin(Adafruit_SharpMem *adsm)
+bool ADSM_begin(struct Adafruit_SharpMem *adsm)
 {
   set_ss(_HIGH_);
   set_clk(_LOW_);
@@ -69,7 +71,7 @@ bool ADSM_begin(Adafruit_SharpMem *adsm)
   return true;
 }
 
-void ADSM_sendbyte(Adafruit_SharpMem *adsm, uint8_t data)
+void ADSM_sendbyte(struct Adafruit_SharpMem *adsm, uint8_t data)
 {
   uint8_t i;
   for (i = 0; i < 8; ++i) {
@@ -87,7 +89,7 @@ void ADSM_sendbyte(Adafruit_SharpMem *adsm, uint8_t data)
   set_clk(_LOW_);
 }
 
-void ADSM_sendbyteLSB(Adafruit_SharpMem *adsm, uint8_t data)
+void ADSM_sendbyteLSB(struct Adafruit_SharpMem *adsm, uint8_t data)
 {
   uint8_t i;
   for (i = 0; i < 8; ++i) {
@@ -95,7 +97,7 @@ void ADSM_sendbyteLSB(Adafruit_SharpMem *adsm, uint8_t data)
     if (data & 0x01) {
       set_mosi(_HIGH_);
     } else {
-      MOSI = LOW;
+        set_mosi(_LOW_);
     }
     set_clk(_HIGH_);
     data >>= 1;
@@ -105,16 +107,16 @@ void ADSM_sendbyteLSB(Adafruit_SharpMem *adsm, uint8_t data)
 }
 
 // 1<<n is a costly operation on AVR -- table usu. smaller & faster
-static const uint8_t PROGMEM
+static const uint8_t 
   set[] = {  1,  2,  4,  8,  16,  32,  64,  128 },
   clr[] = { (uint8_t)~1 , (uint8_t)~2 , (uint8_t)~4 , (uint8_t)~8,
             (uint8_t)~16, (uint8_t)~32, (uint8_t)~64, (uint8_t)~128 };
 
-void ADSM_drawPixel(Adafruit_SharpMem *adsm, int16_t x, int16_t y, uint16_t color)
+void ADSM_drawPixel(struct Adafruit_SharpMem *adsm, int16_t x, int16_t y, uint16_t color)
 {
-  if((x < 0) || (x >= _width) || (y < 0) || (y >= _height)) return;
+  if((x < 0) || (x >= WIDTH) || (y < 0) || (y >= WIDTH)) return;
 
-  switch(rotation) {
+  switch(adsm->rotation) {
    case 1:
     _swap_int16_t(x, y);
     x = WIDTH  - 1 - x;
@@ -132,16 +134,16 @@ void ADSM_drawPixel(Adafruit_SharpMem *adsm, int16_t x, int16_t y, uint16_t colo
   if(color) {
     adsm->sharpmem_buffer[(y * WIDTH + x) / 8] |= set[x & 7];
   } else {
-    adsom->sharpmem_buffer[(y * WIDTH + x) / 8] &= clr[x & 7];
+    adsm->sharpmem_buffer[(y * WIDTH + x) / 8] &= clr[x & 7];
   }
 }
 
 
-uint8_t ADSM_getPixel(Adafruit_SharpMem *adsm, uint16_t x, uint16_t y)
+uint8_t ADSM_getPixel(struct Adafruit_SharpMem *adsm, uint16_t x, uint16_t y)
 {
-  if((x >= _width) || (y >= _height)) return 0; // <0 test not needed, unsigned
+  if((x >= WIDTH) || (y >= HEIGHT)) return 0; // <0 test not needed, unsigned
 
-  switch(rotation) {
+  switch(adsm->rotation) {
    case 1:
     _swap_uint16_t(x, y);
     x = WIDTH  - 1 - x;
@@ -159,18 +161,18 @@ uint8_t ADSM_getPixel(Adafruit_SharpMem *adsm, uint16_t x, uint16_t y)
   return adsm->sharpmem_buffer[(y * WIDTH + x) / 8] & set[x & 7] ? 1 : 0;
 }
 
-void ADSM_clearDisplay(Adafruit_SharpMem *adsm)
+void ADSM_clearDisplay(struct Adafruit_SharpMem *adsm)
 {
   memset(adsm->sharpmem_buffer, 0xff, (WIDTH * HEIGHT) / 8);
   // Send the clear screen command rather than doing a HW refresh (quicker)
   set_ss(_HIGH_);
   ADSM_sendbyte(adsm, adsm->sharpmem_vcom | SHARPMEM_BIT_CLEAR);
   ADSM_sendbyteLSB(adsm, 0x00);
-  TOGGLE_VCOM;
+  TOGGLE_VCOM(adsm);
   set_ss(_LOW_);
 }
 
-void ADSM_refresh(Adafruit_SharpMem *adsm)
+void ADSM_refresh(struct Adafruit_SharpMem *adsm)
 {
   uint16_t i, totalbytes, currentline, oldline;
   totalbytes = (WIDTH * HEIGHT) / 8;
@@ -178,7 +180,7 @@ void ADSM_refresh(Adafruit_SharpMem *adsm)
   // Send the write command
   set_ss(_HIGH_);
   ADSM_sendbyte(adsm, SHARPMEM_BIT_WRITECMD | adsm->sharpmem_vcom);
-  TOGGLE_VCOM;
+  TOGGLE_VCOM(adsm);
 
   // Send the address for line 1
   oldline = currentline = 1;
@@ -202,6 +204,6 @@ void ADSM_refresh(Adafruit_SharpMem *adsm)
   }
 
   // Send another trailing 8 bits for the last line
-  sendbyteLSB(0x00);
+  ADSM_sendbyteLSB(adsm, 0x00);
   set_ss(_LOW_);
 }

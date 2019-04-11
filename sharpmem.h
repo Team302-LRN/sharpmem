@@ -11,7 +11,7 @@
 #define _TEAM_302_SHARPMEM_H_
 
 #include "board.h"
-
+#include <stdbool.h>
 // Width and Heigh of the display
 #define WIDTH (168)
 #define HEIGHT (144)
@@ -24,18 +24,19 @@ struct Adafruit_SharpMem {
   uint8_t mosi;
   uint32_t sharpmem_vcom;
   uint8_t sharpmem_buffer[WIDTH * HEIGHT / 8];
+  uint8_t rotation;
 };
 
 
 
 /* Adafruit_SharpMem functions */
-void ADSM_init(Adafruit_SharpMem *adsm);
-bool ADSM_begin(Adafruit_SharpMem *adsm);
-void ADSM_drawPixel(Adafruit_SharpMem *adsm, int16_t x, int16_t y, uint16_t color);
-uint8_t ADSM_getPixel(Adafruit_SharpMem *adsm, uint16_t x, uint16_t y);
-void ADSM_clearDisplay(Adafruit_SharpMem *adsm);
-void ADSM_refresh(Adafruit_SharpMem *adsm);
-void ADSM_sendbyte(Adafruit_SharpMem *adsm, uint8_t data);
-void ADSM_sendbyteLSB(Adafruit_SharpMem *adsm, uint8_t data);
+void ADSM_init(struct Adafruit_SharpMem *adsm);
+bool ADSM_begin(struct Adafruit_SharpMem *adsm);
+void ADSM_drawPixel(struct Adafruit_SharpMem *adsm, int16_t x, int16_t y, uint16_t color);
+uint8_t ADSM_getPixel(struct Adafruit_SharpMem *adsm, uint16_t x, uint16_t y);
+void ADSM_clearDisplay(struct Adafruit_SharpMem *adsm);
+void ADSM_refresh(struct Adafruit_SharpMem *adsm);
+void ADSM_sendbyte(struct Adafruit_SharpMem *adsm, uint8_t data);
+void ADSM_sendbyteLSB(struct Adafruit_SharpMem *adsm, uint8_t data);
 
 #endif
