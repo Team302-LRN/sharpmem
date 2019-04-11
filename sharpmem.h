@@ -5,12 +5,12 @@
   Driver code for Adafruit Sharp Memory Display: https://www.adafruit.com/product/3502
   Based on Adafruit_SharpMem code and adapted for PIC24.
 
-  ** Waiting on board layout. Need to initalize pins and replace comments like // SS = LOW
-      with the actual code to do so.
 */
 
 #ifndef _TEAM_302_SHARPMEM_H_
 #define _TEAM_302_SHARPMEM_H_
+
+#include "board.h"
 
 // Width and Heigh of the display
 #define WIDTH (168)
@@ -25,6 +25,7 @@ struct Adafruit_SharpMem {
   uint32_t sharpmem_vcom;
   uint8_t sharpmem_buffer[WIDTH * HEIGHT / 8];
 };
+
 
 
 /* Adafruit_SharpMem functions */
