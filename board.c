@@ -7,17 +7,17 @@
 */
 void set_ss(uint8_t val)
 {
-    PORTBbits.RB5 = val;
+    LATBbits.LATB5 = val;
 }
 
 void set_mosi(uint8_t val)
 {
-    PORTBbits.RB3 = val;
+    LATBbits.LATB3 = val;
 }
 
 void set_clk(uint8_t val)
 {
-    PORTBbits.RB2 = val;
+    LATBbits.LATB2 = val;
 }
 
 /*
@@ -47,5 +47,5 @@ void mosi_config_out(void)
 void clk_config_out(void)
 {
   ANSBbits.ANSB2 = 0;
-  TRISBbits.TRISB3 = 0;
+  TRISBbits.TRISB2 = 0;
 }

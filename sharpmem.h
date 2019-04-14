@@ -11,10 +11,28 @@
 #define _TEAM_302_SHARPMEM_H_
 
 #include "board.h"
+#include "mcc_generated_files/spi1.h"
 #include <stdbool.h>
+
 // Width and Heigh of the display
 #define WIDTH (168)
 #define HEIGHT (144)
+
+#ifndef _swap_int16_t
+#define _swap_int16_t(a, b) { int16_t t = a; a = b; b = t; }
+#endif
+#ifndef _swap_uint16_t
+#define _swap_uint16_t(a, b) { uint16_t t = a; a = b; b = t; }
+#endif
+
+
+
+#define SHARPMEM_BIT_WRITECMD   (0x80)
+#define SHARPMEM_BIT_VCOM       (0x40)
+#define SHARPMEM_BIT_CLEAR      (0x20)
+
+#define _HIGH_ (0)
+#define _LOW_ (1)
 
 // Contains information for display, but can probably get rid of the pins variables
 // beause of how PIC access works.
@@ -27,10 +45,8 @@ struct Adafruit_SharpMem {
   uint8_t rotation;
 };
 
-
-
 /* Adafruit_SharpMem functions */
-void ADSM_init(struct Adafruit_SharpMem *adsm);
+void ADSM_init();
 bool ADSM_begin(struct Adafruit_SharpMem *adsm);
 void ADSM_drawPixel(struct Adafruit_SharpMem *adsm, int16_t x, int16_t y, uint16_t color);
 uint8_t ADSM_getPixel(struct Adafruit_SharpMem *adsm, uint16_t x, uint16_t y);

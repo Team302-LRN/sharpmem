@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=pic24_t1.X
+PROJECTNAME=disp_spi.X
 
 # Active Configuration
 DEFAULTCONF=default

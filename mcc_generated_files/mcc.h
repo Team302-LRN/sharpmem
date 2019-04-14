@@ -1,23 +1,23 @@
 /**
-  Generated main.c file from MPLAB Code Configurator
+  @Generated PIC24 / dsPIC33 / PIC32MM MCUs Header File
 
-  @Company
+  @Company:
     Microchip Technology Inc.
 
-  @File Name
-    main.c
+  @File Name:
+    mcc.h
 
-  @Summary
-    This is the generated main.c using PIC24 / dsPIC33 / PIC32MM MCUs.
+  @Summary:
+    This is the mcc.h file generated using PIC24 / dsPIC33 / PIC32MM MCUs
 
-  @Description
-    This source file provides main entry point for system intialization and application code development.
+  @Description:
+    This header file provides implementations for driver APIs for all modules selected in the GUI.
     Generation Information :
         Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.95-b-SNAPSHOT
         Device            :  PIC24FJ256GA702
     The generated drivers are tested against the following:
         Compiler          :  XC16 v1.36
-        MPLAB 	          :  MPLAB X v5.10
+        MPLAB             :  MPLAB X v5.10
 */
 
 /*
@@ -42,42 +42,37 @@
     TERMS.
 */
 
-/**
-  Section: Included Files
-*/
-#include "mcc_generated_files/system.h"
-#include "mcc_generated_files/clock.h"
-#include "sharpmem.h"
-#include <libpic30.h>
+#ifndef MCC_H
+#define	MCC_H
 #include <xc.h>
+#include "system.h"
+#include "clock.h"
+#include "pin_manager.h"
 #include <stdint.h>
+#include <stdbool.h>
+#include "interrupt_manager.h"
+#include "traps.h"
+#include "spi1.h"
 
-/*
-                         Main application
+#ifndef _XTAL_FREQ
+#define _XTAL_FREQ  32000000UL
+#endif
+
+/**
+ * @Param
+    none
+ * @Returns
+    none
+ * @Description
+    Initializes the oscillator to the default states configured in the
+ *                  MCC GUI
+ * @Example
+    OSCILLATOR_Initialize(void);
  */
-int main(void)
-{
-    // initialize the device
-    SYSTEM_Initialize();
-    SPI1_Initialize();
-    struct Adafruit_SharpMem adsm;
-   // ADSM_clearDisplay(&adsm);
-    adsm.rotation = 2;
-    int16_t i, j;
-    int16_t limit = WIDTH * HEIGHT / 8;
-    int16_t data = 0xFFFF;
-    while (1)
-    {
-        for( i = 0; i < limit; ++i) {
-            adsm.sharpmem_buffer[i] = data--;
-        }
-        ADSM_refresh(&adsm);
-        __delay_ms(300);
-    }
+void OSCILLATOR_Initialize(void) __attribute__((deprecated ("\nThis will be removed in future MCC releases. \nUse CLOCK_Initialize (void) instead. ")));
 
-    return 1;
-}
+
+#endif	/* MCC_H */
 /**
  End of File
 */
-

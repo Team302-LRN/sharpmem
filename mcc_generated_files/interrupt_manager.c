@@ -1,25 +1,25 @@
 /**
-  Generated main.c file from MPLAB Code Configurator
+  System Interrupts Generated Driver File 
 
-  @Company
+  @Company:
     Microchip Technology Inc.
 
-  @File Name
-    main.c
+  @File Name:
+    interrupt_manager.h
 
-  @Summary
-    This is the generated main.c using PIC24 / dsPIC33 / PIC32MM MCUs.
+  @Summary:
+    This is the generated driver implementation file for setting up the
+    interrupts using PIC24 / dsPIC33 / PIC32MM MCUs
 
-  @Description
-    This source file provides main entry point for system intialization and application code development.
-    Generation Information :
+  @Description:
+    This source file provides implementations for PIC24 / dsPIC33 / PIC32MM MCUs interrupts.
+    Generation Information : 
         Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.95-b-SNAPSHOT
         Device            :  PIC24FJ256GA702
     The generated drivers are tested against the following:
         Compiler          :  XC16 v1.36
-        MPLAB 	          :  MPLAB X v5.10
+        MPLAB             :  MPLAB X v5.10
 */
-
 /*
     (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
     software and any derivatives exclusively with Microchip products.
@@ -43,41 +43,14 @@
 */
 
 /**
-  Section: Included Files
+    Section: Includes
 */
-#include "mcc_generated_files/system.h"
-#include "mcc_generated_files/clock.h"
-#include "sharpmem.h"
-#include <libpic30.h>
 #include <xc.h>
-#include <stdint.h>
 
-/*
-                         Main application
- */
-int main(void)
-{
-    // initialize the device
-    SYSTEM_Initialize();
-    SPI1_Initialize();
-    struct Adafruit_SharpMem adsm;
-   // ADSM_clearDisplay(&adsm);
-    adsm.rotation = 2;
-    int16_t i, j;
-    int16_t limit = WIDTH * HEIGHT / 8;
-    int16_t data = 0xFFFF;
-    while (1)
-    {
-        for( i = 0; i < limit; ++i) {
-            adsm.sharpmem_buffer[i] = data--;
-        }
-        ADSM_refresh(&adsm);
-        __delay_ms(300);
-    }
-
-    return 1;
-}
 /**
- End of File
+    void INTERRUPT_Initialize (void)
 */
+void INTERRUPT_Initialize (void)
+{
 
+}

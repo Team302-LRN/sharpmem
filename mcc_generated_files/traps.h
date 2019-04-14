@@ -1,25 +1,25 @@
 /**
-  Generated main.c file from MPLAB Code Configurator
+  System Traps Generated Driver File 
 
-  @Company
+  @Company:
     Microchip Technology Inc.
 
-  @File Name
-    main.c
+  @File Name:
+    traps.h
 
-  @Summary
-    This is the generated main.c using PIC24 / dsPIC33 / PIC32MM MCUs.
+  @Summary:
+    This is the generated driver implementation file for handling traps
+    using PIC24 / dsPIC33 / PIC32MM MCUs
 
-  @Description
-    This source file provides main entry point for system intialization and application code development.
-    Generation Information :
+  @Description:
+    This source file provides implementations for PIC24 / dsPIC33 / PIC32MM MCUs traps.
+    Generation Information : 
         Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.95-b-SNAPSHOT
         Device            :  PIC24FJ256GA702
     The generated drivers are tested against the following:
         Compiler          :  XC16 v1.36
-        MPLAB 	          :  MPLAB X v5.10
+        MPLAB             :  MPLAB X v5.10
 */
-
 /*
     (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
     software and any derivatives exclusively with Microchip products.
@@ -42,42 +42,46 @@
     TERMS.
 */
 
-/**
-  Section: Included Files
-*/
-#include "mcc_generated_files/system.h"
-#include "mcc_generated_files/clock.h"
-#include "sharpmem.h"
-#include <libpic30.h>
-#include <xc.h>
+#ifndef _TRAPS_H
+#define _TRAPS_H
+
 #include <stdint.h>
 
-/*
-                         Main application
- */
-int main(void)
-{
-    // initialize the device
-    SYSTEM_Initialize();
-    SPI1_Initialize();
-    struct Adafruit_SharpMem adsm;
-   // ADSM_clearDisplay(&adsm);
-    adsm.rotation = 2;
-    int16_t i, j;
-    int16_t limit = WIDTH * HEIGHT / 8;
-    int16_t data = 0xFFFF;
-    while (1)
-    {
-        for( i = 0; i < limit; ++i) {
-            adsm.sharpmem_buffer[i] = data--;
-        }
-        ADSM_refresh(&adsm);
-        __delay_ms(300);
-    }
-
-    return 1;
-}
 /**
- End of File
-*/
+ * Error codes
+ */
+typedef enum 
+{
+    /* ----- Traps ----- */
+    TRAPS_OSC_FAIL = 0, /** Oscillator Fail Trap vector */
+    TRAPS_STACK_ERR = 1, /** Stack Error Trap Vector */
+    TRAPS_ADDRESS_ERR = 2, /** Address Error Trap Vector */
+    TRAPS_MATH_ERR = 3, /** Math Error Trap Vector */
+    TRAPS_NVM_ERR = 7, /** NVM Error Trap Vector */
+} TRAPS_ERROR_CODE;
 
+/**
+  @Summary
+    Default handler for the traps
+
+  @Description
+    This routine will be called whenever a trap happens. It stores the trap
+    error code and waits forever.
+    This routine has a weak attribute and can be over written.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    None.
+
+*/
+void __attribute__((naked, noreturn, weak)) TRAPS_halt_on_error(uint16_t code);
+
+#endif
