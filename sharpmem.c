@@ -79,9 +79,7 @@ bool ADSM_begin(struct Adafruit_SharpMem *adsm)
 
 void ADSM_sendbyte(struct Adafruit_SharpMem *adsm, uint8_t data)
 {
-    set_ss(_HIGH_);
     SPI1_Exchange8bit(data);
-    set_ss(_LOW_);
 }
 
 void ADSM_sendbyteLSB(struct Adafruit_SharpMem *adsm, uint8_t data)
@@ -159,7 +157,7 @@ void ADSM_refresh(struct Adafruit_SharpMem *adsm)
     totalbytes = sizeof(adsm->sharpmem_buffer);
 
     // Send the write command
-   // set_ss(_HIGH_);
+    set_ss(_HIGH_);
     ADSM_sendbyte(adsm, SHARPMEM_BIT_WRITECMD | adsm->sharpmem_vcom);
     TOGGLE_VCOM(adsm);
 
@@ -184,5 +182,5 @@ void ADSM_refresh(struct Adafruit_SharpMem *adsm)
     }
     // Send another trailing 8 bits for the last line
     ADSM_sendbyte(adsm, 0x00);
-   // set_ss(_LOW_);
+    set_ss(_LOW_);
 }
