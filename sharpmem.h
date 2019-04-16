@@ -46,7 +46,7 @@ struct Adafruit_SharpMem {
 void ADSM_init();
 bool ADSM_begin(struct Adafruit_SharpMem *adsm);
 void ADSM_updateLine(struct Adafruit_SharpMem *adsm, uint16_t line);
-void ADSM_drawPixel(struct Adafruit_SharpMem *adsm, int16_t x, int16_t y, uint16_t color);
+void ADSM_drawPixel(struct Adafruit_SharpMem *adsm, int16_t x, int16_t y, uint32_t color);
 uint8_t ADSM_getPixel(struct Adafruit_SharpMem *adsm, uint16_t x, uint16_t y);
 void ADSM_clearDisplay(struct Adafruit_SharpMem *adsm);
 void ADSM_refresh(struct Adafruit_SharpMem *adsm);

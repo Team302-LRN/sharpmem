@@ -90,7 +90,7 @@ void ADSM_sendbyteLSB(struct Adafruit_SharpMem *adsm, uint8_t data)
 
 
 
-void ADSM_drawPixel(struct Adafruit_SharpMem *adsm, int16_t x, int16_t y, uint16_t color)
+void ADSM_drawPixel(struct Adafruit_SharpMem *adsm, int16_t x, int16_t y, uint32_t color)
 {
   //if((x < 0) || (x >= WIDTH) || (y < 0) || (y >= WIDTH)) return;
 
@@ -152,7 +152,7 @@ void ADSM_clearDisplay(struct Adafruit_SharpMem *adsm)
 
 void ADSM_refresh(struct Adafruit_SharpMem *adsm)
 {
-    int i = 0;
+    int i;
     for (i = 0; i < HEIGHT; ++i) {
         ADSM_updateLine(adsm, i);
     }
@@ -160,9 +160,8 @@ void ADSM_refresh(struct Adafruit_SharpMem *adsm)
 
 void ADSM_updateLine(struct Adafruit_SharpMem *adsm, uint16_t line)
 {
-    int i, numlines, curr_line;
+    int i;
     uint8_t *data; 
-    numlines = ((i+1)/(WIDTH/8)) + 1;
     data = &adsm->sharpmem_buffer[((WIDTH * line) / 8)];
     
     
