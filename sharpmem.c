@@ -176,7 +176,7 @@ void ADSM_updateLine(struct Adafruit_SharpMem *adsm, uint16_t line)
     
     /* Send data for the selected line */
     for (i = 0; i < WIDTH/8; ++i) {
-        ADSM_sendbyte(adsm, *data);
+        ADSM_sendbyteLSB(adsm, *data);
         ++data;
     }
     

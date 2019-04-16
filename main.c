@@ -54,6 +54,8 @@
 #include <stdint.h>
 #include <string.h>
 
+void drawCircle(struct Adafruit_SharpMem *adsm, uint8_t radius);
+
 /*
                          Main application
  */
@@ -85,11 +87,7 @@ int main(void)
     
     while (1)
     {
-        for (i = 1; i <= 100; ++i) {
-            for (j = 0; j < i; ++j) {
-                ADSM_drawPixel(&adsm, i, j, 0x00);
-            }
-        }
+        drawCircle(&adsm, 100);
         for (i = 0; i < HEIGHT; ++i) {
             ADSM_updateLine(&adsm, i);
         }
@@ -103,3 +101,28 @@ int main(void)
  End of File
 */
 
+void drawCircle(struct Adafruit_SharpMem *adsm, uint8_t radius)
+{
+// Consider a rectangle of size N*N 
+    int N = 2*radius+1; 
+    int i, j;
+    int x, y;  // Coordinates inside the rectangle 
+  
+    // Draw a square of size N*N. 
+    for ( i = 0; i < N; i++) 
+    { 
+        for ( j = 0; j < N; j++) 
+        { 
+            // Start from the left most corner point 
+            x = i-radius; 
+            y = j-radius; 
+  
+            // If this point is inside the circle, print it 
+            if (x*x + y*y <= radius*radius+1 ) 
+                ADSM_drawPixel(adsm, i, j, 0x00);
+            else // If outside the circle, print space 
+                ADSM_drawPixel(adsm, i, j, 0xff);
+            //ADSM_drawPixel(adsm, i, j, 0xff);
+        } 
+    } 
+}
