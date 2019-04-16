@@ -39,7 +39,7 @@
  void _UG_ImageUpdate(UG_WINDOW* wnd, UG_OBJECT* obj);
 
  /* Pointer to the gui */
-static UG_GUI* gui;
+static  UG_GUI* gui;
 
 #ifdef USE_FONT_4X6
 __UG_CONST unsigned char font_4x6[256][6]={
@@ -825,7 +825,7 @@ __UG_CONST unsigned char font_5x12[256][12]={
 #endif
 
 #ifdef USE_FONT_6X8
-__UG_CONST unsigned char font_6x8[256][8]={
+__UG_CONST unsigned char  font_6x8[256][8]={
 {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},   // 0x00
 {0x1C,0x22,0x36,0x22,0x2A,0x22,0x1C,0x00},   // 0x01
 {0x1C,0x3E,0x2A,0x3E,0x22,0x3E,0x1C,0x00},   // 0x02
