@@ -54,8 +54,13 @@
 #include <stdint.h>
 #include <string.h>
 
-void drawCircle(struct Adafruit_SharpMem *adsm, uint8_t radius);
+#include "ugui.h"
+#include "disp_obj.h"
 
+
+
+UG_GUI _gui;
+extern struct Adafruit_SharpMem adsm;
 /*
                          Main application
  */
@@ -70,24 +75,28 @@ int main(void)
     set_ss(_LOW_);
     SPI1_Initialize();
 
-    struct Adafruit_SharpMem adsm;
+    
     ADSM_begin(&adsm);
     ADSM_clearDisplay(&adsm);
     
     __delay_ms(500);
     adsm.rotation = 0;
-    int i, j;
-    int16_t limit = WIDTH * HEIGHT / 8;
-    uint8_t data = 0x55;
+    int i;
     
      memset(adsm.sharpmem_buffer, 0x00, (WIDTH * HEIGHT) / 8);
      ADSM_refresh(&adsm);
-     __delay_ms(5000);
+     __delay_ms(500);
      ADSM_clearDisplay(&adsm);
     
+    dispInit();
+    UG_FontSelect(&FONT_6X8);
+    UG_SetBackcolor(C_WHITE);
+    UG_SetForecolor(C_BLACK);
     while (1)
     {
-        drawCircle(&adsm, 100);
+        UG_PutString(50,50, "Hello World!");
+      //  UG_DrawLine(0,0, 50,50, C_BLACK);
+        UG_Update();
         for (i = 0; i < HEIGHT; ++i) {
             ADSM_updateLine(&adsm, i);
         }
@@ -101,28 +110,3 @@ int main(void)
  End of File
 */
 
-void drawCircle(struct Adafruit_SharpMem *adsm, uint8_t radius)
-{
-// Consider a rectangle of size N*N 
-    int N = 2*radius+1; 
-    int i, j;
-    int x, y;  // Coordinates inside the rectangle 
-  
-    // Draw a square of size N*N. 
-    for ( i = 0; i < N; i++) 
-    { 
-        for ( j = 0; j < N; j++) 
-        { 
-            // Start from the left most corner point 
-            x = i-radius; 
-            y = j-radius; 
-  
-            // If this point is inside the circle, print it 
-            if (x*x + y*y <= radius*radius+1 ) 
-                ADSM_drawPixel(adsm, i, j, 0x00);
-            else // If outside the circle, print space 
-                ADSM_drawPixel(adsm, i, j, 0xff);
-            //ADSM_drawPixel(adsm, i, j, 0xff);
-        } 
-    } 
-}
