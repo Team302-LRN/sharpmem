@@ -47,10 +47,12 @@
 */
 #include "mcc_generated_files/system.h"
 #include "mcc_generated_files/clock.h"
+#include "mcc_generated_files/pin_manager.h"
 #include "sharpmem.h"
 #include <libpic30.h>
 #include <xc.h>
 #include <stdint.h>
+#include <string.h>
 
 /*
                          Main application
@@ -59,20 +61,40 @@ int main(void)
 {
     // initialize the device
     SYSTEM_Initialize();
+    /* Set up Pins*/
+    PIN_MANAGER_Initialize();
+
+    
+    set_ss(_LOW_);
     SPI1_Initialize();
+
     struct Adafruit_SharpMem adsm;
-   // ADSM_clearDisplay(&adsm);
-    adsm.rotation = 2;
-    int16_t i, j;
+    ADSM_begin(&adsm);
+    ADSM_clearDisplay(&adsm);
+    
+    __delay_ms(500);
+    adsm.rotation = 0;
+    int i, j;
     int16_t limit = WIDTH * HEIGHT / 8;
-    int16_t data = 0xFFFF;
+    uint8_t data = 0x55;
+    
+     memset(adsm.sharpmem_buffer, 0x00, (WIDTH * HEIGHT) / 8);
+     ADSM_refresh(&adsm);
+     __delay_ms(5000);
+     ADSM_clearDisplay(&adsm);
+    
     while (1)
     {
-        for( i = 0; i < limit; ++i) {
-            adsm.sharpmem_buffer[i] = data--;
+        for (i = 1; i <= 100; ++i) {
+            for (j = 0; j < i; ++j) {
+                ADSM_drawPixel(&adsm, i, j, 0x00);
+            }
         }
-        ADSM_refresh(&adsm);
-        __delay_ms(300);
+        for (i = 0; i < HEIGHT; ++i) {
+            ADSM_updateLine(&adsm, i);
+        }
+        __delay_ms(500);
+        led_Toggle();
     }
 
     return 1;

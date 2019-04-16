@@ -84,7 +84,6 @@ void ADSM_sendbyte(struct Adafruit_SharpMem *adsm, uint8_t data)
 
 void ADSM_sendbyteLSB(struct Adafruit_SharpMem *adsm, uint8_t data)
 {
-  uint8_t i;
   uint8_t data_lsb = BitReverseTable256[data];
   ADSM_sendbyte(adsm, data_lsb);
 }
@@ -153,34 +152,35 @@ void ADSM_clearDisplay(struct Adafruit_SharpMem *adsm)
 
 void ADSM_refresh(struct Adafruit_SharpMem *adsm)
 {
-    uint16_t i, totalbytes, currentline, oldline;
-    totalbytes = sizeof(adsm->sharpmem_buffer);
+    int i = 0;
+    for (i = 0; i < HEIGHT; ++i) {
+        ADSM_updateLine(adsm, i);
+    }
+}
 
-    // Send the write command
+void ADSM_updateLine(struct Adafruit_SharpMem *adsm, uint16_t line)
+{
+    int i, numlines, curr_line;
+    uint8_t *data; 
+    numlines = ((i+1)/(WIDTH/8)) + 1;
+    data = &adsm->sharpmem_buffer[((WIDTH * line) / 8)];
+    
+    
+    /* Send write command */
     set_ss(_HIGH_);
     ADSM_sendbyte(adsm, SHARPMEM_BIT_WRITECMD | adsm->sharpmem_vcom);
     TOGGLE_VCOM(adsm);
-
-    // Send the address for line 1
-    oldline = currentline = 1;
-    ADSM_sendbyteLSB(adsm, currentline);
-    // Send image buffer
-    for (i=0; i<totalbytes; i++)
-    {
-      ADSM_sendbyte(adsm, adsm->sharpmem_buffer[i]);
-      currentline = ((i+1)/(WIDTH/8)) + 1;
-      if(currentline != oldline)
-      {
-        // Send end of line and address bytes
-        ADSM_sendbyteLSB(adsm, 0x00);
-        if (currentline <= HEIGHT)
-        {
-          ADSM_sendbyteLSB(adsm, currentline);
-        }
-        oldline = currentline;
-      }
+    
+    /* Send address for line */
+    ADSM_sendbyteLSB(adsm, line + 1);
+    
+    /* Send data for the selected line */
+    for (i = 0; i < WIDTH/8; ++i) {
+        ADSM_sendbyte(adsm, *data);
+        ++data;
     }
-    // Send another trailing 8 bits for the last line
+    
+    ADSM_sendbyte(adsm, 0x00);
     ADSM_sendbyte(adsm, 0x00);
     set_ss(_LOW_);
 }
