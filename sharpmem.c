@@ -92,7 +92,7 @@ void ADSM_sendbyteLSB(struct Adafruit_SharpMem *adsm, uint8_t data)
 
 void ADSM_drawPixel(struct Adafruit_SharpMem *adsm, int16_t x, int16_t y, uint16_t color)
 {
-  if((x < 0) || (x >= WIDTH) || (y < 0) || (y >= WIDTH)) return;
+  //if((x < 0) || (x >= WIDTH) || (y < 0) || (y >= WIDTH)) return;
 
   switch(adsm->rotation) {
    case 1:
